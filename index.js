@@ -1,43 +1,57 @@
-'use strict';
+"use strict";
 
-var _through = require('through2');
+var _through = require("through2");
 
 var _through2 = _interopRequireDefault(_through);
 
-var _split = require('split2');
+var _split = require("split2");
 
 var _split2 = _interopRequireDefault(_split);
 
-var _pumpify = require('pumpify');
+var _pumpify = require("pumpify");
 
 var _pumpify2 = _interopRequireDefault(_pumpify);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 module.exports = function () {
-
   var count = 0;
+  var currID = null;
+  var blankLine = false;
 
   var write = function write(line, enc, cb) {
+    if (!line.trim()) {
+      blankLine = true;
+      return cb();
+    }
 
-    if (!line.trim()) return cb();
+    var vttLine = line.replace(/(WEBVTT\s*(FILE)?.*)(\r\n)*/g, "").replace(/(\d{2}:\d{2}:\d{2})\.(\d{3}\s+)\-\-\>(\s+\d{2}:\d{2}:\d{2})\.(\d{3}\s*)/g, "$1,$2-->$3,$4").replace(/\<.+\>(.+)/g, "$1").replace(/\<.+\>(.+)\<.+\/\>/g, "$1") + "\r\n";
 
-    var vttLine = line.replace(/(WEBVTT\s*(FILE)?.*)(\r\n)*/g, '').replace(/(\d{2}:\d{2}:\d{2})\.(\d{3}\s+)\-\-\>(\s+\d{2}:\d{2}:\d{2})\.(\d{3}\s*)/g, '$1,$2-->$3,$4').replace(/\<.+\>(.+)/g, '$1').replace(/\<.+\>(.+)\<.+\/\>/g, '$1') + '\r\n';
-
-    if (!vttLine.trim()) return cb();
+    if (!vttLine.trim()) {
+      return cb();
+    }
 
     if (/^Kind:|^Language:/m.test(vttLine)) {
+      blankLine = false;
+      return cb();
+    }
+
+    if (/^[0-9]+$/m.test(vttLine) && blankLine) {
+      currID = parseInt(vttLine);
+      blankLine = false;
       return cb();
     }
 
     if (/^[0-9]+:/m.test(vttLine)) {
-      if (count === 0) {
-        vttLine = ++count + '\r\n' + vttLine;
+      if (currID) {
+        vttLine = count++ === 0 ? currID + "\r\n" + vttLine : "\r\n" + currID + "\r\n" + vttLine;
+        currID = null;
       } else {
-        vttLine = '\r\n' + ++count + '\r\n' + vttLine;
+        vttLine = count++ === 0 ? count + "\r\n" + vttLine : "\r\n" + count + "\r\n" + vttLine;
       }
     }
 
+    blankLine = false;
     cb(null, vttLine);
   };
 

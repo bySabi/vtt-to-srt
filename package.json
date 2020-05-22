@@ -8,7 +8,8 @@
   "bin": "cli.js",
   "scripts": {
     "test": "tape test.js",
-    "build": "babel index.es6 > index.js"
+    "build": "babel index.es6 > index.js",
+    "example": "npm run build && babel-node examples/to_string.js"
   },
   "dependencies": {
     "pumpify": "^1.3.3",
@@ -18,6 +19,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.9.1",
+    "babel-node": "0.0.1-security",
     "babel-preset-es2015": "^6.9.0",
     "concat-stream": "^1.4.10",
     "tape": "^3.0.3"
