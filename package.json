@@ -9,7 +9,7 @@
   "scripts": {
     "test": "tape test.js",
     "build": "babel index.es6 > index.js",
-    "example": "npm run build && babel-node examples/to_string.js"
+    "examples": "npm run build && babel-node examples/to_string.js && babel-node examples/from_file.js"
   },
   "dependencies": {
     "pumpify": "^1.3.3",

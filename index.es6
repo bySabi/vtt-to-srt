@@ -4,7 +4,6 @@ import pumpify from "pumpify";
 
 module.exports = function () {
   let count = 0;
-  let currID = null;
   let blankLine = false;
 
   const write = (line, enc, cb) => {
@@ -33,23 +32,15 @@ module.exports = function () {
     }
 
     if (/^[0-9]+$/m.test(vttLine) && blankLine) {
-      currID = parseInt(vttLine);
       blankLine = false;
       return cb();
     }
 
     if (/^[0-9]+:/m.test(vttLine)) {
-      if (currID) {
-        vttLine =
-          count++ === 0
-            ? `${currID}\r\n${vttLine}`
-            : `\r\n${currID}\r\n${vttLine}`;
-        currID = null;
+      if (count === 0) {
+        vttLine = `${++count}\r\n${vttLine}`;
       } else {
-        vttLine =
-          count++ === 0
-            ? `${count}\r\n${vttLine}`
-            : `\r\n${count}\r\n${vttLine}`;
+        vttLine = `\r\n${++count}\r\n${vttLine}`;
       }
     }
 

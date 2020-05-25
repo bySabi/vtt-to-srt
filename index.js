@@ -16,7 +16,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = function () {
   var count = 0;
-  var currID = null;
   var blankLine = false;
 
   var write = function write(line, enc, cb) {
@@ -37,17 +36,15 @@ module.exports = function () {
     }
 
     if (/^[0-9]+$/m.test(vttLine) && blankLine) {
-      currID = parseInt(vttLine);
       blankLine = false;
       return cb();
     }
 
     if (/^[0-9]+:/m.test(vttLine)) {
-      if (currID) {
-        vttLine = count++ === 0 ? currID + "\r\n" + vttLine : "\r\n" + currID + "\r\n" + vttLine;
-        currID = null;
+      if (count === 0) {
+        vttLine = ++count + "\r\n" + vttLine;
       } else {
-        vttLine = count++ === 0 ? count + "\r\n" + vttLine : "\r\n" + count + "\r\n" + vttLine;
+        vttLine = "\r\n" + ++count + "\r\n" + vttLine;
       }
     }
 
